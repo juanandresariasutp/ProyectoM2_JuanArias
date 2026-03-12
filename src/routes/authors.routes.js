@@ -1,18 +1,24 @@
 import express from "express"
-import { authors } from "../data/data.js"
+
+import {
+  getAllAuthors,
+  getAuthorById,
+  createAuthor,
+  updateAuthor,
+  deleteAuthor
+} from "../services/authors.service.js"
 
 const router = express.Router()
 
 // GET /authors
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  const authors = await getAllAuthors()
   res.json(authors)
 })
 
 // GET /authors/:id
-router.get("/:id", (req, res) => {
-  const id = parseInt(req.params.id)
-
-  const author = authors.find(a => a.id === id)
+router.get("/:id", async (req, res) => {
+  const author = await getAuthorById(req.params.id)
 
   if (!author) {
     return res.status(404).json({ error: "Author not found" })
@@ -22,55 +28,41 @@ router.get("/:id", (req, res) => {
 })
 
 // POST /authors
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const { name, email, bio } = req.body
 
   if (!name || !email) {
-    return res.status(400).json({ error: "Name and email are required" })
+    return res.status(400).json({
+      error: "name and email are required"
+    })
   }
 
-  const newAuthor = {
-    id: authors.length + 1,
-    name,
-    email,
-    bio
-  }
+  const author = await createAuthor(name, email, bio)
 
-  authors.push(newAuthor)
-
-  res.status(201).json(newAuthor)
+  res.status(201).json(author)
 })
 
 // PUT /authors/:id
-router.put("/:id", (req, res) => {
-  const id = parseInt(req.params.id)
+router.put("/:id", async (req, res) => {
+  const { name, email, bio } = req.body
 
-  const author = authors.find(a => a.id === id)
+  const author = await updateAuthor(
+    req.params.id,
+    name,
+    email,
+    bio
+  )
 
   if (!author) {
     return res.status(404).json({ error: "Author not found" })
   }
 
-  const { name, email, bio } = req.body
-
-  if (name) author.name = name
-  if (email) author.email = email
-  if (bio) author.bio = bio
-
   res.json(author)
 })
 
 // DELETE /authors/:id
-router.delete("/:id", (req, res) => {
-  const id = parseInt(req.params.id)
-
-  const index = authors.findIndex(a => a.id === id)
-
-  if (index === -1) {
-    return res.status(404).json({ error: "Author not found" })
-  }
-
-  authors.splice(index, 1)
+router.delete("/:id", async (req, res) => {
+  await deleteAuthor(req.params.id)
 
   res.status(204).send()
 })
