@@ -12,21 +12,12 @@ import {
   badRequestError,
   notFoundError
 } from "../middleware/errors.js"
+import {
+  isNonEmptyString,
+  parsePositiveInteger
+} from "../middleware/validators.js"
 
 const router = express.Router()
-const isNonEmptyString = (value) => (
-  typeof value === "string" && value.trim() !== ""
-)
-
-const parsePositiveInteger = (value) => {
-  const parsedValue = Number(value)
-
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
-    return null
-  }
-
-  return parsedValue
-}
 
 // GET /posts
 router.get("/", async (req, res, next) => {

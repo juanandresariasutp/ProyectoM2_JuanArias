@@ -12,11 +12,9 @@ import {
   badRequestError,
   notFoundError
 } from "../middleware/errors.js"
+import { isNonEmptyString } from "../middleware/validators.js"
 
 const router = express.Router()
-const isNonEmptyString = (value) => (
-  typeof value === "string" && value.trim() !== ""
-)
 
 // GET /authors
 router.get("/", async (req, res, next) => {
