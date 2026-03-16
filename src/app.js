@@ -16,6 +16,12 @@ const app = express()
 
 app.use(express.json())
 
+app.get("/", (req, res) => {
+	res.status(200).json({
+		message: "API running"
+	})
+})
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use("/authors", authorsRoutes)
