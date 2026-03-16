@@ -75,33 +75,53 @@ router.put("/:id", async (req, res, next) => {
   try {
     const { name, email, bio } = req.body
 
-    if (!isNonEmptyString(name) || !isNonEmptyString(email)) {
+    if (
+      name === undefined &&
+      email === undefined &&
+      bio === undefined
+    ) {
       return next(
-        badRequestError("name and email are required")
+        badRequestError("at least one field is required")
       )
     }
 
-    const existingAuthor = await getAuthorByEmail(email.trim())
+    const currentAuthor = await getAuthorById(req.params.id)
 
-    if (
-      existingAuthor &&
-      Number(existingAuthor.id) !== Number(req.params.id)
-    ) {
+    if (!currentAuthor) {
+      return next(notFoundError("Author not found"))
+    }
+
+    if (name !== undefined && !isNonEmptyString(name)) {
       return next(
-        badRequestError("email must be unique")
+        badRequestError("name cannot be empty")
       )
+    }
+
+    if (email !== undefined && !isNonEmptyString(email)) {
+      return next(
+        badRequestError("email cannot be empty")
+      )
+    }
+
+    if (email !== undefined) {
+      const existingAuthor = await getAuthorByEmail(email.trim())
+
+      if (
+        existingAuthor &&
+        Number(existingAuthor.id) !== Number(req.params.id)
+      ) {
+        return next(
+          badRequestError("email must be unique")
+        )
+      }
     }
 
     const author = await updateAuthor(
       req.params.id,
-      name.trim(),
-      email.trim(),
-      bio
+      name !== undefined ? name.trim() : currentAuthor.name,
+      email !== undefined ? email.trim() : currentAuthor.email,
+      bio !== undefined ? bio : currentAuthor.bio
     )
-
-    if (!author) {
-      return next(notFoundError("Author not found"))
-    }
 
     res.status(200).json(author)
   } catch (error) {
