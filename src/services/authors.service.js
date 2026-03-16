@@ -16,6 +16,16 @@ export const getAuthorById = async (id) => {
   return result.rows[0]
 }
 
+// Obtener author por email
+export const getAuthorByEmail = async (email) => {
+  const result = await pool.query(
+    "SELECT * FROM authors WHERE email = $1",
+    [email]
+  )
+
+  return result.rows[0]
+}
+
 // Crear author
 export const createAuthor = async (name, email, bio) => {
   const result = await pool.query(
@@ -43,8 +53,10 @@ export const updateAuthor = async (id, name, email, bio) => {
 
 // Eliminar author
 export const deleteAuthor = async (id) => {
-  await pool.query(
+  const result = await pool.query(
     "DELETE FROM authors WHERE id=$1",
     [id]
   )
+
+  return result.rowCount > 0
 }

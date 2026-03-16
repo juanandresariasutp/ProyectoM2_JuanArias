@@ -31,13 +31,13 @@ export const createPost = async (title, content, author_id) => {
 }
 
 // Actualizar post
-export const updatePost = async (id, title, content) => {
+export const updatePost = async (id, title, content, author_id) => {
   const result = await pool.query(
     `UPDATE posts
-     SET title=$1, content=$2
-     WHERE id=$3
+     SET title=$1, content=$2, author_id=$3
+     WHERE id=$4
      RETURNING *`,
-    [title, content, id]
+    [title, content, author_id, id]
   )
 
   return result.rows[0]
@@ -45,10 +45,12 @@ export const updatePost = async (id, title, content) => {
 
 // Eliminar post
 export const deletePost = async (id) => {
-  await pool.query(
+  const result = await pool.query(
     `DELETE FROM posts WHERE id=$1`,
     [id]
   )
+
+  return result.rowCount > 0
 }
 
 // Obtener posts por author
