@@ -1,0 +1,366 @@
+openapi: "3.0.3"
+info:
+  title: MiniBlog API
+  description: API REST para gestionar authors y posts de un miniblog
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: Authors
+    description: Operaciones sobre autores
+  - name: Posts
+    description: Operaciones sobre posts
+
+paths:
+
+  # ─── AUTHORS ────────────────────────────────────────────────────────────────
+
+  /authors:
+    get:
+      tags: [Authors]
+      summary: Obtener todos los autores
+      responses:
+        "200":
+          description: Lista de autores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Author"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags: [Authors]
+      summary: Crear un nuevo autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthorInput"
+      responses:
+        "201":
+          description: Autor creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /authors/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdParam"
+
+    get:
+      tags: [Authors]
+      summary: Obtener un autor por ID
+      responses:
+        "200":
+          description: Autor encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      tags: [Authors]
+      summary: Actualizar un autor (soporta actualización parcial)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthorUpdateInput"
+      responses:
+        "200":
+          description: Autor actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags: [Authors]
+      summary: Eliminar un autor
+      responses:
+        "204":
+          description: Autor eliminado
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # ─── POSTS ──────────────────────────────────────────────────────────────────
+
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Obtener todos los posts
+      responses:
+        "200":
+          description: Lista de posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags: [Posts]
+      summary: Crear un nuevo post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+      responses:
+        "201":
+          description: Post creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /posts/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdParam"
+
+    get:
+      tags: [Posts]
+      summary: Obtener un post por ID
+      responses:
+        "200":
+          description: Post encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      tags: [Posts]
+      summary: Actualizar un post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+      responses:
+        "200":
+          description: Post actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags: [Posts]
+      summary: Eliminar un post
+      responses:
+        "204":
+          description: Post eliminado
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /posts/author/{authorId}:
+    get:
+      tags: [Posts]
+      summary: Obtener posts de un autor
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          description: ID del autor
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Lista de posts del autor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# ─── COMPONENTS ───────────────────────────────────────────────────────────────
+
+components:
+
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      description: ID del recurso
+      schema:
+        type: integer
+        example: 1
+
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Juan Arias
+        email:
+          type: string
+          format: email
+          example: juan@example.com
+        bio:
+          type: string
+          nullable: true
+          example: Developer y entrenador
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-01T00:00:00.000Z"
+
+    AuthorInput:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+          example: Juan Arias
+        email:
+          type: string
+          format: email
+          example: juan@example.com
+        bio:
+          type: string
+          nullable: true
+          example: Developer y entrenador
+
+    AuthorUpdateInput:
+      type: object
+      description: Al menos un campo es requerido
+      properties:
+        name:
+          type: string
+          example: Juan Arias
+        email:
+          type: string
+          format: email
+          example: juan@example.com
+        bio:
+          type: string
+          nullable: true
+          example: Super entrenador personalizado
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Mi primer post
+        content:
+          type: string
+          example: Contenido del post
+        author_id:
+          type: integer
+          example: 1
+        published:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-01T00:00:00.000Z"
+
+    PostInput:
+      type: object
+      required: [title, content, author_id]
+      properties:
+        title:
+          type: string
+          example: Mi primer post
+        content:
+          type: string
+          example: Contenido del post
+        author_id:
+          type: integer
+          example: 1
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Mensaje de error
+
+  responses:
+    BadRequest:
+      description: Datos inválidos o faltantes
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: name and email are required
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Author not found
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Internal Server Error
