@@ -8,6 +8,10 @@ import {
   updateAuthor,
   deleteAuthor
 } from "../services/authors.service.js"
+import {
+  badRequestError,
+  notFoundError
+} from "../middleware/errors.js"
 
 const router = express.Router()
 const isNonEmptyString = (value) => (
@@ -30,7 +34,7 @@ router.get("/:id", async (req, res, next) => {
     const author = await getAuthorById(req.params.id)
 
     if (!author) {
-      return res.status(404).json({ error: "Author not found" })
+      return next(notFoundError("Author not found"))
     }
 
     res.status(200).json(author)
@@ -45,17 +49,17 @@ router.post("/", async (req, res, next) => {
     const { name, email, bio } = req.body
 
     if (!isNonEmptyString(name) || !isNonEmptyString(email)) {
-      return res.status(400).json({
-        error: "name and email are required"
-      })
+      return next(
+        badRequestError("name and email are required")
+      )
     }
 
     const existingAuthor = await getAuthorByEmail(email.trim())
 
     if (existingAuthor) {
-      return res.status(400).json({
-        error: "email must be unique"
-      })
+      return next(
+        badRequestError("email must be unique")
+      )
     }
 
     const author = await createAuthor(name.trim(), email.trim(), bio)
@@ -72,9 +76,9 @@ router.put("/:id", async (req, res, next) => {
     const { name, email, bio } = req.body
 
     if (!isNonEmptyString(name) || !isNonEmptyString(email)) {
-      return res.status(400).json({
-        error: "name and email are required"
-      })
+      return next(
+        badRequestError("name and email are required")
+      )
     }
 
     const existingAuthor = await getAuthorByEmail(email.trim())
@@ -83,9 +87,9 @@ router.put("/:id", async (req, res, next) => {
       existingAuthor &&
       Number(existingAuthor.id) !== Number(req.params.id)
     ) {
-      return res.status(400).json({
-        error: "email must be unique"
-      })
+      return next(
+        badRequestError("email must be unique")
+      )
     }
 
     const author = await updateAuthor(
@@ -96,7 +100,7 @@ router.put("/:id", async (req, res, next) => {
     )
 
     if (!author) {
-      return res.status(404).json({ error: "Author not found" })
+      return next(notFoundError("Author not found"))
     }
 
     res.status(200).json(author)
@@ -111,7 +115,7 @@ router.delete("/:id", async (req, res, next) => {
     const deleted = await deleteAuthor(req.params.id)
 
     if (!deleted) {
-      return res.status(404).json({ error: "Author not found" })
+      return next(notFoundError("Author not found"))
     }
 
     res.status(204).send()

@@ -8,6 +8,10 @@ import {
   deletePost,
   getPostsByAuthor
 } from "../services/posts.service.js"
+import {
+  badRequestError,
+  notFoundError
+} from "../middleware/errors.js"
 
 const router = express.Router()
 const isNonEmptyString = (value) => (
@@ -40,7 +44,7 @@ router.get("/:id", async (req, res, next) => {
     const post = await getPostById(req.params.id)
 
     if (!post) {
-      return res.status(404).json({ error: "Post not found" })
+      return next(notFoundError("Post not found"))
     }
 
     res.status(200).json(post)
@@ -70,9 +74,9 @@ router.post("/", async (req, res, next) => {
       !isNonEmptyString(content) ||
       parsedAuthorId === null
     ) {
-      return res.status(400).json({
-        error: "title, content and author_id are required"
-      })
+      return next(
+        badRequestError("title, content and author_id are required")
+      )
     }
 
     const post = await createPost(
@@ -98,9 +102,9 @@ router.put("/:id", async (req, res, next) => {
       !isNonEmptyString(content) ||
       parsedAuthorId === null
     ) {
-      return res.status(400).json({
-        error: "title, content and author_id are required"
-      })
+      return next(
+        badRequestError("title, content and author_id are required")
+      )
     }
 
     const post = await updatePost(
@@ -111,7 +115,7 @@ router.put("/:id", async (req, res, next) => {
     )
 
     if (!post) {
-      return res.status(404).json({ error: "Post not found" })
+      return next(notFoundError("Post not found"))
     }
 
     res.status(200).json(post)
@@ -126,7 +130,7 @@ router.delete("/:id", async (req, res, next) => {
     const deleted = await deletePost(req.params.id)
 
     if (!deleted) {
-      return res.status(404).json({ error: "Post not found" })
+      return next(notFoundError("Post not found"))
     }
 
     res.status(204).send()
