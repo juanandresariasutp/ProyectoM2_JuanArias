@@ -28,6 +28,7 @@ El proyecto incluye:
 - [Endpoints principales 🔗](#endpoints-principales)
 - [Manual técnico 🛠️📘](#manual-tecnico)
 - [Registro de uso de IA en el proyecto 🤖](#registro-de-uso-de-ia-en-el-proyecto)
+- [Documentación detallada de IA 📄](#documentacion-detallada-de-ia)
 
 <a id="requisitos"></a>
 ## Requisitos ⚙️
@@ -313,6 +314,13 @@ Durante el desarrollo del proyecto se utilizó IA como asistencia de ingeniería
 - generación de esta documentación técnica
 
 La implementación fue revisada, ejecutada y validada dentro del proyecto antes de consolidar los cambios.
+
+<a id="documentacion-detallada-de-ia"></a>
+## Documentación detallada de IA 📄
+
+Puedes consultar el registro completo de prompts, objetivos y resultados en:
+
+- [Documentación IA](Documentación%20IA.md)
 
 ## Autor del proyecto ✍️
 
