@@ -186,7 +186,13 @@ En Railway, define al menos:
 DATABASE_URL=postgresql://...
 DB_SSL=true
 PORT=3000
+SWAGGER_SERVER_URL=https://delightful-charisma-production-1384.up.railway.app
 ```
+
+Notas para Swagger:
+
+- En local puedes omitir `SWAGGER_SERVER_URL` (se usa `/` automáticamente).
+- En Railway conviene definir `SWAGGER_SERVER_URL` con tu URL pública HTTPS para evitar problemas de esquema/origen en "Try it out".
 
 <a id="internal-url-vs-public-url"></a>
 ### Internal URL vs Public URL 🌐
